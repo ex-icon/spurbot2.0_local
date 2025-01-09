@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>spur bot v2.0</title>
+    <style>
+        @font-face {
+            font-family: 'Plaq108';
+            src: url('./fonts/Plaq%20-%20108.otf') format('opentype');
+        }
+
+        body {
+            background-color: black;
+            color: Chartreuse;
+            font-family: 'Plaq108', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sentence {
+            font-size: 2rem;
+            text-shadow: 0 0 15px Chartreuse, 0 0 25px Chartreuse;
+            max-width: 80%;
+            word-wrap: break-word;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        #generateButton {
+            margin-top: 20px;
+            padding: 5px 5px;
+            background-color: Chartreuse;
+            font-family: 'Plaq108';
+            src: url('./fonts/Plaq%20-%20108.otf') format('opentype');
+            color: black;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 5px Chartreuse, 0 0 5px Chartreuse;
+            border-radius: 50px;
+        }
+
+        #generateButton:hover {
+            background-color: GreenYellow;
+	    box-shadow: 0 0 10px Chartreuse, 0 0 10px Chartreuse;
+        }
+    </style>
+</head>
+<body>
+    <div class="sentence" id="sentence"></div>
+    <button id="generateButton">Generate Divination</button>
+
+    <script>
+        // 
+        const NOUN = [
+    "avatar", "entity", "program", "dream", "cyber", "illusion", "ghost", "soul", "echo", "signal", 
+    "algorithm", "node", "programming", "glitch", "system", "network", "machine", "code", "cyborg", "flux",
+    "drone", "matrix", "avatar", "subroutine", "hologram", "interface", "neural", "simulation",
+    "algorithmic consciousness", "virtuality", "archive", "consciousness", "meta", "hive", "cyberspace", "data organism",
+    "bot", "phantasm", "terminal", "overload", "transformation", "interface", "system", "robot",
+    "metaphor", "control", "cybernetic organism", "memory", "data cloud", "channel", "paradox", "vortex",
+    "pneuma", "machine mind", "black hole", "cybernetics", "interface", "enigma", "disruption", "synapse",
+    "fragment", "disruption", "loop", "paradox", "feedback", "circuit", "frequency", "matrix", "knot", "entropy",
+    "glitch", "fracture", "spiral", "collapse", "dimension", "flux", "flow", "crash", "universe", "wave", 
+    "distortion", "hologram", "dreamscape", "chaos", "echo", "illusion", "network", "blockchain", "token", 
+    "memetic virus", "reality shift", "subroutine", "datastream", "chaotic entity", "data anomaly", "fractured signal",
+    "time-bend", "non-linearity", "reduction", "cascade", "feedback loop", "field", "binary collapse", "cryptographic chain",
+    "cryptocurrency", "hyperspace", "metaverse", "synthetic pulse", "quantum glitch", "vortex", "black hole", "filter",
+    "datacube", "neural path", "hyperspace anomaly", "algorithmic error", "reality glitch", "blockchain node", "neural glitch",
+    "neural drift", "dream node", "biome", "cyber-ecology", "crypto-sphere", "zero-point field", "decentralized network",
+    "subconscious", "transcendence", "simulation layer", "avataric code", "nexus", "extraction point", "static", 
+    "interface wave", "collective mind", "tokenized entity", "network grid", "counter-program", "datamine", 
+    "reality fracture", "universal code", "pathway", "existence filter", "emergent entity", "hypercube", "light curve",
+    "mindplex", "memetic wave", "ecosystem", "dream weave", "crypto-market", "blockchain thread", "time-loop", "neural knot",
+    "simulation glitch", "phantom circuit", "metaphysical code", "hyper-graph", "cybernetic node", "multidimensional entity",  "rhizome", "fractals", "spiral", "fire entity", "water entity", "earth entity", "air entity", "ether", "pulse", "biomorphism", 
+    "aetheric energy", "fracture", "pyre", "fissure", "breath", "lattice structure", "void", "cybernetic temple", 
+    "stream", "dreamwave", "biofield", "prana", "gaiaspace", "techno-shamanism", "fractured echo", "flood", 
+    "obsidian", "sacred flame", "rune", "arcane", "digital totem", "pagan code", "cyberfate", "liquid flow", "descent",
+    "glitch-space", "electrical leyline", "nanocircuit", "eternal flame", "netherworld", "vein", "aqua-technology", 
+    "data river", "sky-network", "druidic code", "pulsar", "organic fractal", "holographic weave", "spiritual machine", 
+    "nodewave", "aqua-system", "neural mist", "void link", "feedback monitor", "broadcast", "mythos", "iconography", "signal disruption", "fluid body", "cyborg myth", "metamorph", "simulacrum", "tape loop", "totem", "oracle", "cathode ray", "flesh-machine", "liminality", "dream machine", "digital altar", "glitch god", "psychic wound", "labyrinth", "binary pulse", "spectral figure", "projection", "ethereal artifact", "visual loop", "holographic flame", "ceremonial conduit", "virtual spirit", "organic machine", "morphic signal", "dream glyph", "subconscious lens", "mythic vessel", "symbolic void", "spatial glitch", "circuit idol", "meta-symbol", "liquid mirror", "phantasm drone", "prismatic key", "emotive pulse", "sacred code", "cyber relic", "mythical avatar", "fractured echo", "chronicle", "hybrid portal", "vortex signal", "elemental myth"
+];
+
+const NOUN_PLURAL = [
+    "avatars", "beings", "entities", "systems", "streams", "codes", "wires", "souls", "shadows", "signals", 
+    "streams", "programs", "codes", "networks", "drones", "fluxes", "neural links", "bots", "robots", "fields",
+    "dreams", "synapses", "databases", "particles", "ghosts", "narratives", "files", "algorithms", "functions",
+    "projections", "layers", "memories", "architectures", "interfaces", "subroutines", "echoes", "portals", 
+    "translations", "layers", "subsystems", "nodes", "grids", "space-time fabrics", "interfaces", "datapoints", "accessories",
+    "feedback", "divergences", "reality", "systematics", "digital avatars", "minds", "temporary-temples", "paradoxes",
+    "fragments", "disruptions", "loops", "paradoxes", "feedbacks", "circuits", "frequencies", "matrices", "knots", "entropies",
+    "glitches", "fractures", "spirals", "collapses", "dimensions", "fluxes", "flows", "crashes", "universes", 
+    "distortions", "holograms", "dreamscapes", "chaos", "echoes", "illusions", "networks", "tokens", 
+    "memetic viruses", "reality shifts", "subroutines", "datastreams", "chaotic entities", "data anomalies", "fractured signals",
+    "time-bends", "non-linearities", "reductions", "cascades", "feedback loops", "fields", "binary collapses", "cryptographic chains",
+    "cryptocurrencies", "hyperspaces", "metaverses", "synthetic pulses", "quantum glitches", "vortices", "black holes", "filters",
+    "datacubes", "neural paths", "hyperspace anomalies", "algorithmic errors", "reality glitches", "blockchain nodes", "neural glitches",
+    "neural drifts", "dream nodes", "biomes", "cyber-ecologies", "crypto-spheres", "zero-point fields", "decentralized networks",
+    "subconscious threads", "simulation layers", "avataric programs", "nexus portals", "reality structures", "network channels",
+    "fractured dimensions", "tokenized entities", "mind webs", "cybernetic grids", "memory banks", "interconnected neurons",
+    "digital fabrics", "feedback networks", "metaphysical realms", "emergent layers", "memory clusters", "bioelectric pulses", 
+    "circuit-linked minds", "holographic streams", "data banks", "algorithmic clusters", "data scapes", "mind-lattice connections",
+    "memetic data", "cryptographic nodes", "sensorial nodes", "digital reefs", "dreaming points", "virtual time zones", "node clusters", "fractals", "rhizomes", "spirals", "whispers", "quicksands", "vortexes", "dreamwaves", "algorithms", "neural hubs", 
+    "cyber-temples", "glitch patches", "pulses", "waterfalls", "stone cairns", "digital sigils", "holographic pathways", 
+    "biological circuits", "sacred streams", "techno-runes", "aquatic signals", "flames", "airwaves", "light-breaths", 
+    "neural swirls", "codes of air", "hollow trees", "datacodes", "liquid particles", "cybernetic whispers", "electromagnetic rifts", 
+    "earth tremors", "energy fields", "firestorms", "data rituals", "electrical flows", "sacred ashes", "feedback monitors", "broadcasts", "mythoi", "iconographies", "signal disruptions", "fluid bodies", "cyborg myths", "metamorphs", "simulacra", "tape loops", "totems", "oracles", "cathode rays", "flesh-machines", "liminalities", "dream machines", "digital altars", "glitch gods", "psychic wounds", "labyrinths", "binary pulses", "spectral figures", "projections", "ethereal artifacts", "visual loops", "holographic flames", "ceremonial conduits", "virtual spirits", "organic machines", "morphic signals", "dream glyphs", "subconscious lenses", "mythic vessels", "symbolic voids", "spatial glitches", "circuit idols", "meta-symbols", "liquid mirrors", "phantasm drones", "prismatic keys", "emotive pulses", "sacred codes", "cyber relics", "mythical avatars", "fractured echoes", "chronicles", "hybrid portals", "vortex signals", "elemental myths"
+];
+
+const VERB = [
+    "ascend", "transform", "connect", "awaken", "decode", "evolve", "transcend", "manifest", "deconstruct", 
+    "adapt", "dissolve", "disintegrate", "download", "distort", "reprogram", "navigate", "interface", "awaken", 
+    "upload", "calculate", "decipher", "analyze", "displace", "filter", "disconnect", "reboot", "synchronize", 
+    "project", "negotiate", "enhance", "examine", "simulate", "merge", "clone", "rebuild", "hyperlink", 
+    "merge", "reframe", "modify", "extract", "expand", "connect", "integrate", "divert", "encounter", 
+    "sync", "reconnect", "calibrate", "reframe", "ascend", "connect", "reconfigure", "accelerate",
+    "fragment", "disrupt", "loop", "collapse", "distort", "fracture", "spiral", "glitch", "unfold", "shift", 
+    "dream", "hack", "crash", "evolve", "manifest", "analyze", "deconstruct", "reprogram", "redirect", "displace", 
+    "merge", "navigate", "decode", "perceive", "download", "filter", "anomalize", "rebuild", "decrypt", 
+    "expand", "loopback", "sync", "disconnect", "scramble", "connect", "fragmentize", "rearrange", "fragment", 
+    "accelerate", "migrate", "alter", "interface", "hyperlink", "invert", "reconfigure", "embed", "expand",
+    "integrate", "disconnect", "paradox", "update", "restructure", "mirror", "remix", "collapse", "activate",
+    "extract", "hyperspace", "accelerate", "encrypt", "reflect", "decrypt", "compute", "calculate", "circulate",
+    "compile", "integrate", "compress", "render", "anomalize", "reflect", "trigger", "reset", "filter", 
+    "write", "calculate", "rewire", "compile", "infuse", "abstract", "unlock", "upload", "adjust", 
+    "convert", "reactivate", "alert", "emulate", "distort", "accelerate", "align", "fold", "configure", 
+    "weave", "emerge", "collapse", "fracture", "unfold", "envelope", "reframe", "drift", "analyze",
+    "interpolate", "accelerate", "modify", "invoke", "circulate", "anomalize", "decrypt", "load", "optimize", "fracture", "spiral", "flow", "ignite", "dissolve", "immerse", "connect", "intertwine", "dream", "rise", 
+    "restructure", "sync", "deconstruct", "breathe", "echo", "submerge", "manifest", "reaffirm", "reboot", 
+    "perceive", "weave", "diffuse", "interact", "engage", "reflect", "shapeshift", "evaporate", "sync",
+    "pulse", "permeate", "transform", "align", "expand", "dissipate", "filter", "expand", "resonate", "channel"
+];
+
+
+const VERB_PLURAL = [
+    "ascends", "transforms", "connects", "awakens", "decodes", "evolves", "transcends", "manifests", "deconstructs", 
+    "adapts", "dissolves", "disintegrates", "downloads", "distorts", "reprograms", "navigates", "interfaces", "uploads", 
+    "calculates", "deciphers", "analyzes", "displaces", "filters", "disconnects", "reboots", "synchronizes", "projects", 
+    "negotiates", "enhances", "examines", "simulates", "merges", "clones", "rebuilds", "hyperlinks", "reframes", "modifies", 
+    "extracts", "expands", "integrates", "diverts", "encounters", "syncs", "reconnects", "calibrates", "reframes", "accelerates",
+    "fragments", "disrupts", "loops", "collapses", "distorts", "fractures", "spirals", "glitches", "unfolds", "shifts", 
+    "dreams", "hacks", "crashes", "evolves", "manifests", "analyzes", "deconstructs", "reprograms", "redirects", "displaces", 
+    "merges", "navigates", "decodes", "perceives", "downloads", "filters", "anomalizes", "rebuilds", "decrypts", 
+    "expands", "loopbacks", "syncs", "disconnects", "scrambles", "connects", "fragmentizes", "rearranges", "fragments", 
+    "accelerates", "migrates", "alters", "interfaces", "hyperlinks", "inverts", "reconfigures", "embeds", "expands",
+    "integrates", "disconnects", "paradoxes", "updates", "restructures", "mirrors", "remixes", "collapses", "activates",
+    "extracts", "hyperspaces", "accelerates", "encrypts", "reflects", "decrypts", "computes", "calculates", "circulates",
+    "compiles", "integrates", "compresses", "renders", "anomalizes", "reflects", "triggers", "resets", "filters", 
+    "writes", "calculates", "rewires", "compiles", "infuses", "abstracts", "unlocks", "uploads", "adjusts", 
+    "converts", "reactivates", "alerts", "emulates", "distorts", "accelerates", "aligns", "folds", "configures", 
+    "weaves", "emerges", "collapsing", "fractures", "unfolds", "envelopes", "reframes", "drifts", "analyzes",
+    "interpolates", "accelerates", "modifies", "invokes", "circulates", "anomalizes", "decrypts", "loads", "optimizes", "fractures", "spirals", "flows", "ignites", "dissolves", "immerses", "entangles", "dreams", "shapeshifts", "aligns", 
+    "restructures", "fuses", "echoes", "submerges", "manifest", "syncs", "reflects", "engages", "weaves", 
+    "diffuses", "absorbs", "expands", "resonates", "channels", "permeates", "drifts", "filters", "converges", 
+    "emerges", "awakens", "shifts", "expands"
+];
+
+const ADJECTIVE = [
+    "ethereal", "digital", "cybernetic", "fragmented", "non-linear", "virtual", "mechanical", "post-human", 
+    "transcendent", "mystical", "synthetic", "ubiquitous", "augmented", "immersive", "disruptive", "fluid", 
+    "chimeric", "radical", "complex", "cyborgian", "organic", "haptic", "autonomous", "post-apocalyptic", 
+    "multiversal", "recursive", "ubiquitous", "complex", "parallel", "anomalous", "algorithmic", "self-referential", 
+    "neurological", "recursive", "data-driven", "entropic", "transitory", "simulated", "reduced", "meta-physical", 
+    "quantum", "cyber-chimeric", "alien", "neural", "invisible", "dissonant", "embedded", "hyperreal", 
+    "gravitational", "revolutionary", "occult-like", "philosophical", "esoteric", "metaphysical", "divine", "mystical", 
+    "chaotic", "accelerated", "paradoxical", "celestial", "spectral", "infinite", "transcendental", "alchemical", 
+    "digitalized", "hidden", "pneumatic", "recursive", "spiraling", "disruptive", "dreamlike", "chaotic", "fragmented", 
+    "glitchy", "fractal", "non-linear", "infinite", "unstable", "sublime", "twisting", "distorted", "recursive", 
+    "subatomic", "phantasmic", "undefined", "fragmentary", "ecological", "dissonant", "cyber-cryptic", "memetic", "circuit-bent",
+    "hyperdimensional", "retro-futuristic", "hyperrealistic", "surreal", "organic", "dream-seeped", "undulating", "hyperbolic", 
+    "crystalline", "mechanistic", "allegorical", "inverted", "anomalous", "haunted", "volatile", "transformative", 
+    "glitch-perfected", "harmonized", "turbulent", "irrational", "coiling", "time-bent", "neuralized", "paradoxical", 
+    "slippery", "unfolding", "dream-stitched", "labyrinthine", "surreal", "anomalous", "transmutable", "inverted", 
+    "cloaked", "technological", "neural-powered", "cryptographic", "recursive", "fractalized", "cyber-abstracted", 
+    "glitch-driven", "optical", "cross-dimensional", "liquid-like", "machine-perfected", "cyber-anomalous", "telematic", 
+    "biosphere", "cryptosphere", "chimeric", "mystic", "digitalized", "pathogenic", "hyperlooped", "seamless", "flowing", "fractally designed", "pyrokinetic", "aquamorphic", "earthbound", "airborne", "pagan", "holographic", "sacred", 
+    "cyber-shamanic", "numinous", "fracture-bound", "transdimensional", "biomimetic", "acausal", "deep time", 
+    "sub-quantum", "druidic", "biocybernetic", "ethereal", "nanocosmic", "human", "uncanny", "liminal", "cathodic", "fragmented", "surreal", "ceremonial", "transcendent", "mythic", "iconic", "symbolic", "dreamlike", "haptic", "prismatic", "ethereal", "organic", "cybernetic", "recursive", "phantasmagoric", "liminal", "cryptic", "immersive", "glitching", "layered", "submerged", "fractured", "oscillating", "spectral", "morphic", "liquid", "monolithic", "aural", "neural", "binary", "holographic", "narrative", "pulsing", "ceremonial", "recursive", "immersive", "divine", "fluidic", "techno-sacred", "evolving", "shimmering", "luminescent", "encoded", "alien", "woven", "mystical", "nonlinear", "fractal", "prophetic", "subliminal", "elemental"
+];
+
+const LANDSCAPE = [
+    "cyberspace", "digital realm", "dreamscape", "grid", "simulation", "void", "matrix", "abyss", "quantum field", 
+    "city", "deep web", "hyperreality", "infinite loop", "singularity", "dystopia", "utopia", 
+    "cascade", "paradox", "machine world", "feedback loop", "meta-grid", "data field", "virtual expanse", 
+    "network scape", "nanoworld", "trans-dimensional space", "cyber garden", "meta-universe", "fractured dimension",
+    "augmented reality", "hybrid space", "planetary system", "future city", "techno-scape", "simulation space", 
+    "synthetic dimension", "digital consciousness", "disrupted reality", "data wasteland", "sub-culture", 
+    "grid", "trans-space", "net", "interference zone", "neural field", "logic space", "the void", "overclocked reality",
+    "construct", "data horizon", "digital ether", "temporal realm", "fractured world", "hyper-dimensionality", 
+    "biosphere", "space-time continuum", "network cloud", "augmented domain", "cyber wasteland", "electric plains",
+    "futuristic city", "interface zone", "programmed universe", "time fold", "interactive space", "data archipelago", 
+    "augmented grid", "cyber jungle", "digital mountain", "code realm", "binary plains", "virtual land", 
+    "glitch world", "reality web", "floating grid", "network sphere", "dream landscape", "cyber continent", 
+    "artificial biosphere", "dream state", "subworld", "the netherworld", "digital sea", "space oasis", 
+    "hyperloop realm", "augmented world", "cyber sea", "dimensional sphere", "dream universe", "fractured fractal", "rhizomatic network", "spiral vortex", "pyro-field", "streaming data", "rune-shield", 
+    "earth grid", "digital temple", "mist-portal", "airborne realm", "biomimetic space", "fluidic expanse", 
+    "aetheric tunnel", "pagan landscape", "data-crypt", "quantum wasteland", "cyber-fog", "glitch labyrinth", 
+    "digital ocean", "holographic sky", "sacred river", "data flux", "fire-scarred realm", "cyber-forest", 
+    "neural desert", "nanocircuit expanse", "machine sea", "arcane stream", "temporal loop", "bioforest"
+];
+
+
+        const EMOTION = [
+    "bliss", "fear", "confusion", "elation", "despair", "tranquility", "awe", "nostalgia", "emptiness", "euphoria", 
+    "alienation", "nervousness", "tranquility", "indifference", "solitude", "melancholy", "serenity", 
+    "resignation", "dread", "fascination", "detachment", "overload", "entropy", "desire", "joy", "paranoia", 
+    "intensity", "delusion", "peace", "clarity", "awareness", "detachment", "tension", "anticipation",
+    "silence", "sadness", "suspicion", "contemplation", "curiosity", "paradoxical", "cosmic dread", "mysticism", 
+    "disillusion", "tranquility", "euphoria", "existential crisis", "compulsion", "ecstasy", "numbness", 
+    "melancholy", "distortion", "overwhelm", "urgency", "ecstatic", "fascination", "anxiety", "despondency", 
+    "numbness", "hysteria", "psychosis", "fantasy", "tranquil", "haunting", "vulnerability", "bewilderment", 
+    "elation", "desperation", "creativity", "chaos", "fearful anticipation", "catharsis", "ennui", "detachment", 
+    "nonchalance", "disconnect", "exhilaration", "serendipity", "ambivalence", "inspiration", "dark wonder", 
+    "sorrow", "melancholic bliss", "frustration", "guilt", "lostness", "detached joy", "serenity", "hope", 
+    "introspection", "eerie calm", "ecological nostalgia", "tranquil wonder", "solace", "mystical calm", "calmness", 
+    "reflection", "euphoric bliss", "bland contentment", "yearning", "anxious anticipation", "elusive joy", 
+    "curiosity", "inner peace", "nervous anticipation", "euphoric yearning", "paradoxical happiness", "introspective despair", 
+    "shadowed serenity", "dissonance", "mind-bending curiosity", "mystical joy", "chronic longing", "cyber-euphoria", "machine grief", "ethereal joy", "pagan ecstasy", "rhizomatic peace", "transcendent bliss",
+    "emergence", "neural overload", "spiritual awakening", "dystopian hope", "cyber-comfort", "bio-sentiment", 
+    "chaotic calm", "illusionary joy", "mystical sorrow", "dream-born longing", "glitch-driven anxiety", 
+    "primal release", "fire-fueled passion", "submerged sorrow", "rising transcendence", "digital nostalgia", 
+    "aetheric peace", "flux energy", "earth pulse", "networked euphoria", "fluidic anger", "sky-formed sadness"
+];
+
+
+        const BODY_PART = [
+    "mind", "spine", "heart", "neural network", "skin", "eye", "hand", "circuit", "pulse", "limb", 
+    "synapse", "core", "processor", "digit", "joint", "mechanism", "sensor", "tendon", "skull", 
+    "nerve", "brain", "forearm", "neuron", "cortex", "prosthesis", "sinew", "muscle", "hip", "wrist", 
+    "bloodstream", "retina", "metabolism", "bone", "synaptic pathway", "connection", "elbow", "data path", 
+    "nucleus", "cell", "skin cell", "cranium", "bionic joint", "neurotransmitter", "biomechanics", "fiber", 
+    "pulse", "heart rate", "sensorial input", "muscle fiber", "limb interface", "phantom-limb", "stimulation point", 
+    "biceps", "fibula", "temporal lobe", "olfactory bulb", "larynx", "vocal cords", "diaphragm", "shoulder", 
+    "ribcage", "abdomen", "gastrointestinal tract", "ankle", "tibia", "fibula", "patella", "gluteus", "trapezius", 
+    "jaw", "teeth", "tongue", "uvula", "vein", "artery", "sclera", "pupil", "vessel", "pulmonary system", 
+    "esophagus", "pharynx", "femur", "pelvis", "cerebellum", "medulla", "occipital lobe", "parietal lobe", 
+    "temporal lobe", "nucleus accumbens", "hippocampus", "thalamus", "pituitary gland", "endocrine glands", 
+    "adrenal gland", "subcutaneous layer", "lymphatic system", "intervertebral disc", "tarsus", "heel", 
+    "calf", "deltoid", "quadriceps", "hamstring", "triceps", "liver", "kidney", "pancreas", "stomach", 
+    "large intestine", "small intestine", 
+    "exocrine gland", "lymph node", "axilla", "nail", "cuticle", "palm", "sweat gland", 
+    "capillary", "synovial fluid sac","gland",
+    "alien tentacle", "insectoid exoskeleton", "alien antennae", "biomechanical spine", "cybernetic eye", "mechanical limb", 
+    "robotic arm", "cybernetic skull", "alien claw", "insectoid wing", "spider-like leg", "alien mandible", 
+    "cybernetic heart", "xenomorph tail", "flesh-and-bone fusion", "retractable claws", "liquid metal skin", "artificial tendon", 
+    "nanobot-infused bloodstream", "holographic limb", "etheric body", "data receptor", "translucent skin", 
+    "insectoid mouthpart", "alien breathing sac", "sci-fi visor", "cybernetic brain implant", "synthetic bone plating", 
+    "biomechanical finger", "tissue-engineered organ", "hollow bones", "flesh augmented by technology", "multi-dimensional eyes", 
+    "feral claws", "exotic fur", "fluidic organ", "metaphysical senses", "reconstructed jaw", "synthetic muscle fiber", 
+    "golem-like limb", "fantasy dragon wing", "biomechanical neural web", "insectoid antennae", "gravitational limb", 
+    "vampiric fang", "chimera limb", "ethereal spine", "light-based optic nerve", "cybernetic cochlea", "cyber-flesh interface", 
+    "synthetic eye socket", "robotic spinal cord", "futuristic circulatory system", "mechanized rib", "armored exoskeleton", 
+    "nano-infused epidermis", "glowing veins", "phantasmagoric organ", "robotic leg joint", "digital heartbeat", "energy-infused limb", 
+    "etheric brainwave transmitter", "cybernetic limb extension", "biomechanical hand", "digital spinal column", "reconstructed torso", 
+    "laser eye implant", "magnetic hand", "alien horn", "muscular cyborg arm", "sentient mechanical prosthesis", "semi-organic neural system"
+];
+
+
+        const THEME = [
+    "unity", "chaos", "transformation", "singularity", "revolution", "entropy", "illusion", "evolution", "resistance", "liberation", 
+    "paradox", "memory", "harmony", "intersection", "fracture", "flow", "control", "connection", "disruption", "awakening", 
+    "escape", "collapse", "reprogramming", "metamorphosis", "emergence", "interface", "feedback loop", "rebirth", "acceleration", 
+    "liberation", "dissonance", "darkness", "entropy", "threshold", "meta-state", "quantum leap", "unveiling", "subversion",
+    "non-linearity", "spiral", "glitch", "dreamscape", "chaos theory", "fractal", "feedback loop", "deconstruction", "anomaly", 
+    "deviation", "hyperreal", "cybernetic evolution", "resonance", "disintegration", "convergence", "transcendence", "technological singularity", 
+    "cosmic order", "counter-culture", "virtual revolution", "biological transcendence", "chaotic evolution", "post-human", "cognitive collapse",
+    "psychic entanglement", "ecological collapse", "emergent properties", "quantum chaos", "perception shift", "parallel realities", "crypto-cultures", 
+    "synthetic ecologies", "digital entropy", "mind-meld", "universal flow", "introspection", "infinite recursion", "digital consciousness", 
+    "cryptic feedback", "meta-realities", "meta-consciousness", "deep learning", "neural network evolution", "memetic engineering", "psychedelic journeys", 
+    "networked existence", "meta-systems", "alternate dimensions", "self-replicating systems", "holographic flow", "dream logic", "psychonautic", 
+    "interdimensionality", "hyperlink", "post-humanism", "black hole dynamics", "augmented intelligence", "memory synthesis", "turing paradox", 
+    "algorithmic justice", "neuro-biology", "biohacking", "feedback entropy", "singularity theory", "dark net", "digital spirits", "viral cultural codes", 
+    "cryptocurrency", "hyper-culture", "bioinformatics", "neural programming", "quantum encryption", "data sovereignty", "post-cyberpunk", 
+    "virtual currency", "transcendent logic", "algorithmic governance", "memetic warfare", "collective consciousness", "hyper-structure", "eco-cryptography",
+    "transcendent ecology", "digital souls", "holographic society", "reprogramming reality", "decentralized systems", "data-driven philosophy", 
+    "virtual ecology", "the simulation hypothesis", "metaverse", "memetic transmission", "cyberpunk ethos", "eco-simulations", "dream theory", 
+    "feedback anomaly", "dream hacking", "hyper-existence", "cultural entropy", "blockchain ecosystems", "the glitch", "neural evolution", 
+    "psychic feedback", "fractured realities", "self-aware algorithms", "quantum consciousness", "synthetic evolution", "metaphysical encryption", 
+    "biological simulation", "transdimensional flux", "post-reality", "ambient chaos", "reality manipulation", "cyber-ecology", "deep neural networks", 
+    "blockchain reality", "cyber-collectivism", "virtual metamorphosis", "cyber-synapses", "subconscious loop", "psychic algorithm", "reality fractals", 
+    "meta-information", "neuromorphic systems", "quantum feedback", "holographic entities", "emergent glitches", "growth", "cycle", "transformation", "entropy", "emergence", "renewal", "rebirth", "liminality", "symbiosis", 
+    "chaos", "order", "flux", "polarity", "balance", "infinity", "integration", "anomaly", "harmony", "resonance", 
+    "flow", "oscillation", "recursion", "duality", "mysticism", "spirituality", "technology", "nature", "alchemy", 
+    "convergence", "expansion", "collapse", "network", "connectivity", "dissonance", "metamorphosis", "sacred geometry", 
+    "feedback", "holism", "multiplicity", "rhizomes", "fractals", "spirals", "fire", "water", "earth", "air", "ether", 
+    "transcendence", "immanence", "neural web", "quantum entanglement", "biofeedback", "dreamscapes", 
+    "bioelectricity", "cybernetic mysticism", "energetic field", "druidic wisdom", "rune codes", "organic technology", 
+    "technological spirituality", "digital ether", "cosmic interconnection", "aetheric resonance", "emergent systems", 
+    "glitch aesthetics", "recursive dreams", "interwoven realities", "holistic patterns", "temporal loops", "holographic fractals", 
+    "spiritual recursion", "symbiotic networks", "infinite spirals", "flame-born renewal", "watery depths", "earthly grounding", 
+    "aerial freedom", "pyrokinetics", "aquamorphism", "tectonic shifts", "wind currents", "geomancy", "cyber-paganism", 
+    "techno-shamanism", "digital folklore", "sacred algorithms", "fire rituals", "water cleansing", "earth bonding", 
+    "airborne whispers", "holographic universes", "eco-consciousness", "sacred spirals", "root systems", 
+    "fractured realities", "organic fractals", "etheric dreams", "liquid information", "glitch waves", 
+    "woven tapestries", "sacred cycles", "electric fire", "networked streams", "energy feedback", "temporal spirals", 
+    "morphic fields", "biomimetic rhythms", "sacred flames", "etheric loops", "cybernetic pagan rituals", "fractal intelligence"
+
+];
+
+const AVATAR_APPEARANCE = [
+    "holographic", "bioluminescent", "fractal", "shimmering", "spiral-bound", "liquid", "flame-born", "rooted", 
+    "etherial", "aetherial", "crystalline", "metallic", "woven", "translucent", "vaporous", "ember-filled", 
+    "watery", "moss-covered", "stone-skinned", "wind-swept", "glitching", "recursive", "symbiotic", "organic", 
+    "mechanical", "cybernetic", "chimeric", "polymorphic", "fluid", "iridescent", "feral", "ashen", "radiant", 
+    "shadowed", "phoenix-like", "dragon-scaled", "branching", "tendril-wrapped", "insectoid", "animalistic", 
+    "vortex-like", "mirror-skinned", "veined", "networked", "node-laden", "starry", "nebular", "voidlike", 
+    "gleaming", "pulsating", "sacred-marked", "tattooed", "druidic", "withered", "ether-dripping", "liquid-crystal", 
+    "ember-veined", "sparked", "plasma-infused", "dream-woven", "thorned", "lichen-draped", "ashen-hued", "fire-scribed", 
+    "aquatic", "circuit-threaded", "glyph-carved", "bio-mechanical", "vortex-etched", "feathered", "winged", 
+    "multifaceted", "prismatic", "spiked", "wispy", "shard-like", "geometric", "cloud-like", "storm-bound", 
+    "earth-cracked", "runic", "aura-lit", "floral", "mechanism-clad", "ether-coiled", "serpent-like", 
+    "veil-wrapped", "wave-rippled", "lava-infused", "ice-shard", "data-woven", "quantum-layered", 
+    "glitch-wreathed", "tendril-armed", "star-dusted", "cosmic-threaded", "plume-tailed", "nebula-formed", 
+    "pulse-reactive", "dust-cloaked", "sand-sculpted", "flame-tongued", "storm-marked", "ocean-hearted", 
+    "veil-laden", "fog-bound", "stone-carved", "root-entangled", "fire-dancer", "sky-painted", "storm-eyed", 
+    "moonlit", "sun-forged", "time-marked", "energy-dripped", "fragmented", "cloud-bound", "digital-glitched"
+];
+
+
+
+        // Sentences to be randomized
+        const sentences = [
+            "My Avatar is #NOUN#.", "The #ADJECTIVE# avatar is both everywhere and nowhere, existing in the #LANDSCAPE# like #EMOTION# #ADJECTIVE# #NOUN_PLURAL#.", "The #ADJECTIVE# glitch in the #THEME#-#THEME# system transforms #NOUN_PLURAL# into #NOUN#-like forms.", "#NOUN# becomes the skin of the avatar, merging the mind with the #LANDSCAPE# of #NOUN_PLURAL#.", "The #ADJECTIVE# glitch is not an error, but #NOUN# that #VERB_PLURAL# the boundary of #NOUN#-#THEME# system.",
+
+"The #ADJECTIVE# machine #VERB_PLURAL# #NOUN#, reshaping the #THEME# into #ADJECTIVE# fragments.", "Your #BODY_PART# is now code, you endlessly #VERB# through #NOUN_PLURAL#.",
+"In the quiet of the #LANDSCAPE#, the avatar #VERB_PLURAL# through the #ADJECTIVE# #LANDSCAPE#, seeking #NOUN# hidden beneath the layers of #NOUN_PLURAL#.",
+"In the digital ether, #NOUN_PLURAL# are parsed through the #THEME# system to reveal #ADJECTIVE# patterns. But are we interpreting fate or just #ADJECTIVE# noise filtered by our #ADJECTIVE# biases?",
+"My Avatar emerges from the #LANDSCAPE#, a manifestation of #ADJECTIVE# #NOUN#.", "Are #NOUN_PLURAL# really guiding us, or are they simply #ADJECTIVE# projections of human desire, filtered through #THEME# systems and rendered as #ADJECTIVE# #NOUN_PLURAL#?", "The avatar is not a body, but #NOUN# entangled in #NOUN_PLURAL#, and fractured through #THEME#-#THEME#.",
+"With a surge of #ADJECTIVE# power, you cast the #ADJECTIVE# #NOUN# spell, invoking the essence of #NOUN_PLURAL# to #VERB# your opponent's #NOUN#. The #NOUN_PLURAL# summoned from the #LANDSCAPE# defend your position, while you prepare to #VERB# with your #NOUN_PLURAL#, gaining #EMOTION# as the battlefield shifts. The #NOUN# card is now activated, allowing you to #VERB# and #VERB# with devastating force, securing a victory as the #THEME# overtakes your rival's defenses.", "#NOUN# approaches, and the #LANDSCAPE# pulses with the energy of #NOUN_PLURAL#. As your avatar aligns with the #ADJECTIVE# forces of #THEME#, a new path opens before you. #NOUN_PLURAL# you have gathered will empower you to #VERB#, shifting the very fabric of your existence. The future is #ADJECTIVE#, and your #BODY_PART# trembles with anticipation.",
+    "In the #ADJECTIVE# #LANDSCAPE#, you meet an avatar with a #ADJECTIVE# #BODY_PART# and the essence of #NOUN_PLURAL#. To proceed, you must #VERB# #NOUN# while channeling the #THEME#.",
+"Your avatar is the #ADJECTIVE# manifestation of #ADJECTIVE# #NOUN_PLURAL#, casting a shadow upon the #LANDSCAPE#. The future ahead is not linear, but the ripples of your choices echo across the #NOUN_PLURAL#. #NOUN# calls you to #VERB# with your avatar's #BODY_PART#, guiding you to the #THEME# that awaits. There, the boundaries between #NOUN_PLURAL# and self dissolve into #ADJECTIVE# clarity.",
+    "You awaken with a jolt, your #BODY_PART# now a fusion of #ADJECTIVE# #BODY_PART# and #NOUN#. Your mind is filled with thoughts of #THEME# and you feel both #ADJECTIVE# and #ADJECTIVE# #EMOTION#.",
+    "My avatar is a paradoxical figure, shaped by the #LANDSCAPE# and imbued with the powers of #THEME#. Its form is #ADJECTIVE# and its purpose is to #VERB# the #NOUN_PLURAL#.",
+    "You must traverse the #LANDSCAPE#, gather #NOUN# of the #THEME#, and face the #ADJECTIVE# trial of #EMOTION#. Only through #VERB_PLURAL# will you unlock #NOUN# of #ADJECTIVE# transformation.",
+    "The avatar's creation was foretold in the #NOUN_PLURAL# of the #ADJECTIVE# #LANDSCAPE#. It is a #ADJECTIVE# system of #NOUN_PLURAL#, and its #BODY_PART# is an expression of the #THEME#.",
+    "I harness the #ADJECTIVE# power of #NOUN_PLURAL#, my avatar transcends the #LANDSCAPE# and reshapes the #THEME#.",
+    "In the #ADJECTIVE# void, my avatar resonates with #ADJECTIVE# #NOUN_PLURAL#. It is an entity that #VERB_PLURAL# beyond the realm of the #LANDSCAPE#.",
+    "You awaken as #NOUN#, with a #BODY_PART# made of #NOUN_PLURAL#. The #LANDSCAPE# shifts, and your avatar feels both #ADJECTIVE# and #ADJECTIVE#, yet you are compelled to #VERB# the #THEME#.",
+    "To complete your journey, seek the #NOUN# marked by #ADJECTIVE# #NOUN_PLURAL# in the #LANDSCAPE#. These artifacts will #VERB# the #NOUN_PLURAL# into a #ADJECTIVE# #THEME#.",
+    "#ADJECTIVE#, #ADJECTIVE#, #ADJECTIVE#... The #LANDSCAPE# and #NOUN_PLURAL# intertwine, heralding the cycle of #THEME# and the emergence of #THEME#.",
+	    "when you get to the #ADJECTIVE# #LANDSCAPE# you will encounter the #ADJECTIVE# avatar. It is #NOUN# with the #ADJECTIVE# #BODY_PART#. you and the avatar must #VERB# together with #NOUN_PLURAL# until the #THEME#-#THEME# system #VERB_PLURAL# into #ADJECTIVE# #EMOTION#.", "The avatar moves like #NOUN# machine, programmed to #VERB# in the #LANDSCAPE#, and #VERB# the #THEME#-#THEME# paradigm.",
+	    "you awake. your body feels as if it is made of #NOUN_PLURAL#. Where there once was your #BODY_PART# there is now a new #BODY_PART#. You have become your avatar. You have become one with the #LANDSCAPE#. You are free to #VERB# and #VERB#, you can transform #THEME#. You feel #EMOTION# yet #ADJECTIVE# #EMOTION#.", 
+	   	    "my avatar embodies a new archetype - formed from the ruins of the #LANDSCAPE#, made in the shadow of #NOUN_PLURAL#, under the #ADJECTIVE# moon. my body is like #ADJECTIVE# #NOUN_PLURAL#, my mind like #NOUN# system, and my spirit like the #LANDSCAPE#. I am #ADJECTIVE# yet #ADJECTIVE#.", 
+	    "you must collect sacred artefacts from the #LANDSCAPE# - a fragment of #NOUN#, the essence of #NOUN#, and an object that represents the #THEME#. the process is #ADJECTIVE# yet #ADJECTIVE#, you must #VERB# and #VERB# #NOUN_PLURAL# until #NOUN# transforms into #NOUN#.",
+	    "the ritual involving sacred forms of #NOUN# and #NOUN# has revealed an ancient dream, a future memory... the #ADJECTIVE# systems that connect #ADJECTIVE# #NOUN_PLURAL# and #ADJECTIVE# #NOUN_PLURAL# are #ADJECTIVE# and #ADJECTIVE# like #NOUN#.",
+            "I am connected to #ADJECTIVE# #NOUN_PLURAL#, I use these powers to #VERB# the #THEME# of #NOUN_PLURAL#.",
+            "I embody #NOUN# as my avatar, my archetype is #ADJECTIVE#, I am sometimes #ADJECTIVE# but never #ADJECTIVE#.",
+            "When you awake you find yourself in the #LANDSCAPE#, you feel #EMOTION# and an ache in your #BODY_PART# but you are distracted by #NOUN#, IT SEEMS #ADJECTIVE#...IT IS LIKE #NOUN#.",
+            "you must go FIND #NOUN# in the #LANDSCAPE#, take with you #NOUN# that #VERB_PLURAL# #NOUN_PLURAL# through #NOUN# AND #NOUN# that is connected to #ADJECTIVE# #NOUN_PLURAL#. IT IS MARKED BY THE SYMBOL OF #ADJECTIVE# #NOUN_PLURAL#.",
+            "#ADJECTIVE#, #ADJECTIVE#, #ADJECTIVE#... THE #LANDSCAPE# AND #NOUN_PLURAL# ARE CONNECTED, TOGETHER THEY SYMBOLISE the end of the #THEME# and the beginning of the great #THEME#."
+        ];
+
+        // Function to get random element from an array
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Function to handle determiners (a, an, the)
+        function getDeterminer(word) {
+            if (word.endsWith('s') || NOUN_PLURAL.includes(word)) {
+                return '';  // No determiner needed for plural
+            }
+            
+            const vowels = ['a', 'e', 'i', 'o', 'u'];
+            const firstLetter = word.toLowerCase()[0];
+            return vowels.includes(firstLetter) ? 'an' : 'a';
+        }
+
+        // Function to generate a random sentence with proper grammar
+        function generateRandomSentence() {
+            let sentence = sentences[Math.floor(Math.random() * sentences.length)];
+            const usedAdjectives = new Set();
+            const usedNouns = new Set();
+            const usedLandscapes = new Set();
+            const usedVerbs = new Set();
+            const usedThemes = new Set();
+
+            // Ensure no repeated words from the same category
+            sentence = sentence.replace(/#NOUN#/g, function() {
+                let noun;
+                do {
+                    noun = getRandomElement(NOUN);
+                } while (usedNouns.has(noun));
+                usedNouns.add(noun);
+                return getDeterminer(noun) + ' ' + noun;
+            });
+
+            sentence = sentence.replace(/#NOUN_PLURAL#/g, function() {
+                let pluralNoun;
+                do {
+                    pluralNoun = getRandomElement(NOUN_PLURAL);
+                } while (usedNouns.has(pluralNoun));
+                usedNouns.add(pluralNoun);
+                return pluralNoun;
+            });
+
+            sentence = sentence.replace(/#VERB#/g, function() {
+                let verb;
+                do {
+                    verb = getRandomElement(VERB);
+                } while (usedVerbs.has(verb));
+                usedVerbs.add(verb);
+                return verb;
+            });
+
+            sentence = sentence.replace(/#VERB_PLURAL#/g, function() {
+                let verb;
+                do {
+                    verb = getRandomElement(VERB_PLURAL);
+                } while (usedVerbs.has(verb));
+                usedVerbs.add(verb);
+                return verb;
+            });
+
+            sentence = sentence.replace(/#ADJECTIVE#/g, function() {
+                let adjective;
+                do {
+                    adjective = getRandomElement(ADJECTIVE);
+                } while (usedAdjectives.has(adjective));
+                usedAdjectives.add(adjective);
+                return adjective;
+            });
+
+            sentence = sentence.replace(/#LANDSCAPE#/g, function() {
+                let landscape;
+                do {
+                    landscape = getRandomElement(LANDSCAPE);
+                } while (usedLandscapes.has(landscape));
+                usedLandscapes.add(landscape);
+                return landscape;
+            });
+
+            sentence = sentence.replace(/#EMOTION#/g, function() {
+                return getRandomElement(EMOTION);
+            });
+
+            sentence = sentence.replace(/#BODY_PART#/g, function() {
+                return getRandomElement(BODY_PART);
+            });
+
+            sentence = sentence.replace(/#THEME#/g, function() {
+                return getRandomElement(THEME);
+            });
+
+            return sentence;
+        }
+
+        // Get elements from DOM
+        const sentenceDiv = document.getElementById('sentence');
+        const generateButton = document.getElementById('generateButton');
+
+        // Toggle sentence generation
+        generateButton.addEventListener('click', () => {
+            if (sentenceDiv.style.opacity === '0' || sentenceDiv.innerText === '') {
+                sentenceDiv.innerText = generateRandomSentence();
+                sentenceDiv.style.opacity = 1;
+            } else {
+                sentenceDiv.style.opacity = 0;
+                setTimeout(() => {
+                    sentenceDiv.innerText = generateRandomSentence();
+                    sentenceDiv.style.opacity = 1;
+                }, 2000);  // Wait for fade-out before changing text
+            }
+        });
+    </script>
+</body>
+</html>
